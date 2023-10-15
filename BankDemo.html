@@ -1,0 +1,518 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <!-- Add this line to import Bootstrap 4 CSS -->
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>var applicationUrl='https://localhost:7298/api'</script>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <style>
+    body {font-family: Arial, Helvetica, sans-serif;}
+    .scrollable-table-body {
+      max-height: 300px;  overflow-y: scroll; cursor: pointer;cursor: -webkit-grab; cursor: grab;}
+      .scrollable-table-body:active { cursor: -webkit-grabbing;cursor: grabbing;}.fieldLableForMapping{padding-left: 5px;}
+
+    input[type=text], input[type=password] {
+      width: 100%;
+      padding: 12px 20px;
+      margin: 8px 0;
+      display: inline-block;
+      border: 1px solid #ccc;
+      box-sizing: border-box;
+    }
+    .dbObjectDiv {
+      border: 1px solid #dde6e9; border-radius: 3px; min-height: 300px; width:80% ; margin: 0 auto;}
+
+    .container {
+      padding: 16px;
+    }
+
+    .modal {
+      display: none;
+      position: fixed;
+      z-index: 1;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      overflow: auto;
+      background-color: rgba(0,0,0,0.4);
+      padding-top: 60px;
+    }
+
+    .success {
+      border-color: #04AA6D;
+      color: green;
+    }
+    .close {
+  position: absolute;
+  right: 25px;
+  top: 0;
+  color: #000;
+  font-size: 35px;
+  font-weight: bold;
+}
+
+    .success:hover {
+      background-color: #04AA6D;
+      color: white;
+    }
+
+    .modal-content {
+      background-color: #fefefe;
+      margin: 5% auto 15% auto;
+      border: 1px solid #888;
+      width: 32%;
+    }
+
+    .close {
+      position: absolute;
+      right: 25px;
+      top: 0;
+      color: #000;
+      font-size: 35px;
+      font-weight: bold;
+    }
+
+    .close:hover, .close:focus {
+      color: red;
+      cursor: pointer;
+    }
+
+    .animate {
+      -webkit-animation: animatezoom 0.6s;
+      animation: animatezoom 0.6s;
+    }
+
+    @-webkit-keyframes animatezoom {
+      from {-webkit-transform: scale(0)} 
+      to {-webkit-transform: scale(1)}
+    }
+    .imgcontainer {
+  text-align: center;
+  margin: 24px 0 12px 0;
+  position: relative;
+}
+
+    @keyframes animatezoom {
+      from {transform: scale(0)} 
+      to {transform: scale(1)}
+    }
+
+    @media screen and (max-width: 300px) {
+      span.psw {
+        display: block;
+        float: none;
+      }
+      .cancelbtn {
+        width: 100%;
+      }
+    }
+
+    .btn {
+      border: 2px solid black;
+      background-color: white;
+      color: black;
+      padding: 14px 28px;
+      font-size: 16px;
+      cursor: pointer;
+    }
+
+    .info {
+      border-color: #2196F3;
+      color: dodgerblue;
+    }
+
+    .info:hover {
+      background: #2196F3;
+      color: white;
+    }
+
+    /* Custom alert styles */
+    .custom-alert {
+      background-color: yellow; /* Background color for alerts */
+      color: black; /* Text color for alerts */
+      border: 2px solid orange; /* Border color for alerts */
+      padding: 12px; /* Padding for alerts */
+      margin-top: 10px; /* Margin at the top of alerts */
+      text-align: center;
+      display: none; /* Initially hide the alert */
+    }
+  </style>
+</head>
+<body>
+  <center>
+    <h2>Banking solution</h2>
+    <button class="btn info" onclick="document.getElementById('id01').style.display='block'" style="width: 40%;">Creat Account</button>
+    <br>
+    <br>
+    
+    <button class="btn info" onclick="document.getElementById('id02').style.display='block'" style="width: 40%;">Check Balance</button>
+    <br>
+    <br>
+    <label for="UserCust" style="color:#2196F3"> Enter Customer Id</label>
+    <br>
+    <input id="UserCust" type="number" min="1" style="width: 10%;" class="form-control">
+    <hr>
+    <table>
+      <tr>
+        <td>
+          <button class="btn info" onclick="loadMapFieldsVal()">Accounts</button>
+        </td>
+        <td style="width: 30px;"></td>
+        <td>
+          <button class="btn info" onclick="loadTransactions()">Transactions</button>
+        </td>
+      </tr>
+    </table>
+  </center>
+  <br>
+  <div id="mappedFieldsDiv" class="form-group">
+    </div>
+  <div id="id01" class="modal">
+    <div class="modal-content animate">
+      <div class="imgcontainer">
+      <span onclick="document.getElementById('id01').style.display='none'" class="close" title="Close Modal">&times;</span>
+    </div>
+      <div class="container">
+     
+        <div class="form-group">
+          <label for="userId">Customer Id:</label>
+          <input type="text" class="form-control" id="userId">
+        </div>
+        <div class="form-group">
+          <label for="credit">Initial Credit:</label>
+          <input type="number" class="form-control" id="credit" min="0" step="100">
+        </div>
+        <button type="button" class="btn btn-success" onclick="createAccount()">Login</button>
+        <br><br>
+        <br>
+        <br>
+        <div class="error_message" style="display: none;"></div>
+      </div>
+    </div>
+  </div>
+  <div id="id02" class="modal">
+    <div class="modal-content animate">
+      <div class="imgcontainer">
+      <span onclick="document.getElementById('id02').style.display='none'" class="close" title="Close Modal">&times;</span>
+    </div>
+      <div class="container">
+        <div class="form-group">
+          <label for="userId2">Customer Id:</label>
+          <input type="text" class="form-control" id="userId2">
+        </div>
+        <div class="form-group">
+          <button type="button" class="btn btn-success" onclick="getTotalBalanceForCustomerById()">Show Balance</button>
+        </div>
+        <div class="form-group">
+          <label for="balance">Balance Id:</label>
+          <input type="text" disabled="true" class="form-control" id="balance">
+        </div>
+       
+    </div>
+  </div>
+  <script>
+    var modal = document.getElementById('id01');
+
+    window.onclick = function(event) {
+        if (event.target == modal) {
+            modal.style.display = "none";
+        }
+    }
+  </script>
+  <script>
+   var iserror=false;
+    function showAlert(message, type) {
+      var element = document.querySelector(".error_message");
+  if (iserror) {
+    element.style.display = "initial";
+    element.style.color = "red";
+    element.textContent =type +":"+message;
+
+    setTimeout(function() {
+      element.style.display = "none";
+    }, 3000); 
+  }
+  else{
+    element.style.display = "initial";
+    element.style.color = "green";
+    element.textContent =type +":"+message;
+
+    setTimeout(function() {
+      element.style.display = "none";
+    }, 3000);
+
+  }
+    }
+
+     
+    function createAccount() {
+  const userId = $('#userId').val();
+  const initialCredit = $('#credit').val();
+  const url = applicationUrl+'/Customer/AutoCreateAccountByCustomerId?initialCredit=' + initialCredit;
+
+  $.ajax({
+    url: url,
+    method: 'POST',
+    headers: {
+      'accept': '*/*',
+      'UserId': userId.toString(),
+    },
+    success: function(data) {
+
+     iserror=false;
+     showAlert('The Account has Been Created',' smile !!')
+    },
+    error: function(jqXHR, textStatus, errorThrown) {
+      iserror=true;
+      showAlert('An error occurred while creating the account', 'error');
+    }
+  });
+}
+
+function loadMapFieldsVal() {
+  
+  var customerId=$("#UserCust").val();
+
+  $.ajax({
+        url: applicationUrl+'/Customer/GetCustomerById',
+        method: 'GET',
+        headers: {
+            'accept': 'text/plain',
+            'CustomerId': customerId
+        },
+        success: function (action) {
+            if (action) {
+                const accounts = action.accounts;
+
+                if (accounts && accounts.length > 0) {
+                    let html = `<div class="dbObjectDiv "> <div class="scrollable-table-body">
+                                  <table style="width: 60%;margin-left: 100px" class="table-striped">
+                                    <thead>
+                                        <tr class="mappedFieldsTableHeaderRow">
+                                            <th style="text-align: center;"><label class="control-label">Id</label></th>
+                                            <th style="text-align: center;"><label class="control-label">CustomerId</label></th>
+                                            <th style="text-align: center;"><label class="control-label">Balance</label></th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>`;
+
+                    accounts.forEach(account => {
+                        html += `<tr>
+                                    <td class="col-lg-6 col-md-6 col-xs-6 fieldLableForMapping" style="padding-left:12px;padding-right:0;height: 40px;">${account.id}</td>
+                                    <td class="col-lg-6 col-md-6 col-xs-6" style="padding-left:5;padding-right:5;height: 40px;">${account.customerId}</td>
+                                    <td class="col-lg-6 col-md-6 col-xs-6" style="padding-left:5;padding-right:5;height: 40px;">${account.balance}</td>
+                                </tr>`;
+                    });
+
+                    html += `</tbody></table></div></div>`;
+                    $("#mappedFieldsDiv").html(html);
+                    $('#mappedFieldsDiv').css('display', 'initial');
+                } else {
+                    // No accounts found, display an empty table
+                    const emptyTable = `<div class="dbObjectDiv "> <div class="scrollable-table-body">
+                                      <table style="width: 60%;margin-left: 100px" class="table-striped">
+                                        <thead>
+                                            <tr class="mappedFieldsTableHeaderRow">
+                                                <th style="text-align: center;"><label class="control-label">Id</label></th>
+                                                <th style="text-align: center;"><label class="control-label">CustomerId</label></th>
+                                                <th style="text-align: center;"><label class="control-label">Balance</label></th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr>
+                                                <td colspan="3" style="text-align: center;">No data available</td>
+                                            </tr>
+                                        </tbody>
+                                      </table>
+                                       </div></div>`;
+
+                    $("#mappedFieldsDiv").html(emptyTable);
+                    $('#mappedFieldsDiv').css('display', 'initial');
+                }
+            } else {
+                // Action object is undefined, display an empty table
+                const emptyTable = `<div class="dbObjectDiv "> <div class="scrollable-table-body">
+                                  <table style="width: 60%;margin-left: 100px" class "table-striped">
+                                    <thead>
+                                        <tr class="mappedFieldsTableHeaderRow">
+                                            <th style="text-align: center;"><label class="control-label">Id</label></th>
+                                            <th style="text-align: center;"><label class="control-label">CustomerId</label></th>
+                                            <th style="text-align: center;"><label class="control-label">Balance</label></th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td colspan="3" style="text-align: center;">No data available</td>
+                                        </tr>
+                                    </tbody>
+                                  </table>
+                                </div></div>`;
+
+                $("#mappedFieldsDiv").html(emptyTable);
+                $('#mappedFieldsDiv').css('display', 'initial');
+                
+            }
+        },
+        error: function () {
+            // Handle the error case here
+            const emptyTable = `<div class="dbObjectDiv "> <div class="scrollable-table-body">
+                              <table style="width: 60%;margin-left: 100px" class="table-striped">
+                                <thead>
+                                    <tr class="mappedFieldsTableHeaderRow">
+                                        <th style="text-align: center;"><label class="control-label">Id</label></th>
+                                        <th style="text-align: center;"><label class="control-label">CustomerId</label></th>
+                                        <th style="text-align: center;"><label class="control-label">Balance</label></th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td colspan="3" style="text-align: center;">Error loading data</td>
+                                    </tr>
+                                </tbody>
+                              </table>
+                            </div></div>`;
+
+            $("#mappedFieldsDiv").html(emptyTable);
+            $('#mappedFieldsDiv').css('display', 'initial');
+        }
+    });
+}
+function loadTransactions() {
+  var customerId=$("#UserCust").val();  
+  $.ajax({
+        url: applicationUrl+'/Customer/GetCustomerById',
+        method: 'GET',
+        headers: {
+            'accept': 'text/plain',
+            'CustomerId': customerId
+        },
+        success: function (action) {
+            if (action) {
+                const accounts = action.accounts;
+
+                if (accounts && accounts.length > 0) {
+                    let html = `<div class="dbObjectDiv "> <div class="scrollable-table-body">
+                                  <table style="width: 60%;margin-left: 100px" class="table-striped">
+                                    <thead>
+                                        <tr class="mappedFieldsTableHeaderRow">
+                                            <th style="text-align: center;"><label class="control-label">Id</label></th>
+                                            <th style="text-align: center;"><label class="control-label">AccountId</label></th>
+                                            <th style="text-align: center;"><label class="control-label">Value</label></th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>`;
+
+                    accounts.forEach(account => {
+                        const transactions = account.transactions;
+                        if (transactions && transactions.length > 0) {
+                            transactions.forEach(transaction => {
+                                html += `<tr>
+                                            <td class="col-lg-6 col-md-6 col-xs-6 fieldLableForMapping" style="padding-left:12px;padding-right:0;height: 40px;">${transaction.id}</td>
+                                            <td class="col-lg-6 col-md-6 col-xs-6" style="padding-left:5;padding-right:5;height: 40px;">${transaction.accountId}</td>
+                                            <td class="col-lg-6 col-md-6 col-xs-6" style="padding-left:5;padding-right:5;height: 40px;">${transaction.value}</td>
+                                        </tr>`;
+                            });
+                        }
+                    });
+
+                    html += `</tbody></table></div></div>`;
+                    $("#mappedFieldsDiv").html(html);
+                    $('#mappedFieldsDiv').css('display', 'initial');
+                } else {
+                    // No transactions found, display an empty table
+                    const emptyTable = `<div class="dbObjectDiv "> <div class="scrollable-table-body">
+                                      <table style="width: 60%;margin-left: 100px" class="table-striped">
+                                        <thead>
+                                            <tr class="mappedFieldsTableHeaderRow">
+                                                <th style="text-align: center;"><label class="control-label">Id</label></th>
+                                                <th style="text-align: center;"><label class="control-label">AccountId</label></th>
+                                                <th style="text-align: center;"><label class="control-label">Value</label></th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr>
+                                                <td colspan="3" style="text-align: center;">No data available</td>
+                                            </tr>
+                                        </tbody>
+                                      </table>
+                                    </div></div>`;
+
+                    $("#mappedFieldsDiv").html(emptyTable);
+                    $('#mappedFieldsDiv').css('display', 'initial');
+                }
+            } else {
+                // Action object is undefined, display an empty table
+                const emptyTable = `<div class="dbObjectDiv "> <div class="scrollable-table-body">
+                                  <table style="width: 60%;margin-left: 100px" class "table-striped">
+                                    <thead>
+                                        <tr class="mappedFieldsTableHeaderRow">
+                                            <th style="text-align: center;"><label class="control-label">Id</label></th>
+                                            <th style="text-align: center;"><label class="control-label">AccountId</label></th>
+                                            <th style="text-align: center;"><label class="control-label">Value</label></th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td colspan="3" style="text-align: center;">No data available</td>
+                                        </tr>
+                                    </tbody>
+                                  </table>
+                                </div></div>`;
+
+                $("#mappedFieldsDiv").html(emptyTable);
+                $('#mappedFieldsDiv').css('display', 'initial');
+            }
+        },
+        error: function () {
+            // Handle the error case here
+            const emptyTable = `<div class="dbObjectDiv "> <div class="scrollable-table-body">
+                              <table style="width: 60%;margin-left: 100px" class="table-striped">
+                                <thead>
+                                    <tr class="mappedFieldsTableHeaderRow">
+                                        <th style="text-align: center;"><label class="control-label">Id</label></th>
+                                        <th style="text-align: center;"><label class="control-label">AccountId</label></th>
+                                        <th style="text-align: center;"><label class="control-label">Value</label></th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td colspan="3" style="text-align: center;">Error loading data</td>
+                                    </tr>
+                                </tbody>
+                              </table>
+                            </div></div>`;
+
+            $("#mappedFieldsDiv").html(emptyTable);
+            $('#mappedFieldsDiv').css('display', 'initial');
+        }
+    });
+}
+
+function getTotalBalanceForCustomerById() {
+  var userId=$('#userId2').val();
+  const url = applicationUrl+'/Customer/GetTotalBalanceForCustomerById';
+  const customerId = userId;
+
+  $.ajax({
+    url: url,
+    type: 'GET',
+    headers: {
+      'accept': 'text/plain',
+      'CustomerId': customerId
+    },
+    success: function(data) {
+      $('#balance').val(data);
+    },
+    error: function() {
+      $('#balance').val(0);
+    }
+  });
+}
+
+
+
+  </script>
+</body>
+</html>
